@@ -499,10 +499,10 @@ static int pbkdf2_check(
 		return LUTIL_PASSWD_ERR;
 	}
 
-	/* consistency check */
-	if(rc != PBKDF2_SALT_SIZE){
-		return LUTIL_PASSWD_ERR;
-	}
+#ifdef SLAPD_PBKDF2_DEBUG
+       printf("  Returned targetindex for salt:\t%d\n", rc);
+#endif
+       size_t salt_value_size = rc;
 
 	/* The targetsize require PBKDF2_MAX_DK_SIZE + 1 in lutil_b64_pton. */
 	rc = lutil_b64_pton(dk_b64, dk_value, sizeof(dk_value));
@@ -524,7 +524,7 @@ static int pbkdf2_check(
 #elif HAVE_GNUTLS
 	PBKDF2(current_ctx, current_hmac_update, current_hmac_digest,
 						  dk_len, iteration,
-						  PBKDF2_SALT_SIZE, salt_value,
+						  salt_value_size, salt_value,
 						  dk_len, input_dk_value);
 
 #elif HAVE_MOZNSS
